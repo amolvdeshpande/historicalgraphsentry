@@ -77,7 +77,12 @@ In this chapter, we discuss two aspects. First, compact storage of historical gr
 
 Finally, its worth mentioning that there is a related but orthogonal body of work which we do not touch in this chapter. It deals with the need to do {\em real-time analytics on the streaming data} as it is being generated; here the scope of the analysis typically only includes the latest snapshot or the snapshots from a recent window. The key challenge here is to be able to deal with the high rate at which the data is often generated.
 
-
+\begin{figure}
+\centering
+\includegraphics [width=0.85\textwidth]{entity-time.pdf}
+\caption{A temporal graph can be represented across two different dimensions - timeand entity. The chart lists retrieval tasks (black), graph operations (red), example queries(magenta) at different granularities of time and entity size.}
+\label{fig:et}
+\end{figure}
 
 %Main Text
 \section{Overview}
