@@ -105,7 +105,7 @@ and entity. The chart lists retrieval tasks (black), graph operations (red), exa
 
 The frequent change of a temporal graph poses a significant challenge to algorithm design, because the overwhelming majority of graph algorithms assume static graph structures. One would have to design special algorithms for each application to accommodate the dynamic aspects of graphs. To support general-purpose computations, most of the temporal graph systems adopt a strategy to separate graph updates from graph computation. More specifically, although updates are continually applied to a temporal graph, graph computation is only performed on a sequence of successive \emph{static} views of the temporal graph. For simplicity, most systems adopt a \emph{discretized-time} approach, so that time domain is set of natural numbers, i.e., $t\in \mathcal{N}$. 
 
-The separation of graph update and graph computation not only allows existing algorithms designed for static graphs to be used for analyzing temporal graphs, but also enables the same familiar computation interface in existing static graph processing systems to be used for temporal graphs. In fact, TIDE employs the message passing-based vertex-centric programming model like in Pregel~\cite{pregel} for analyzing dynamic graphs, while Kineograph and Chronos use the vertex-centric scatter-gather model (like the GAS model of GraphLab~\cite{graphlab}) in either a pull mode or a push mode. In addition, Chronos can also support the edge-centric model proposed in X-Stream~\cite{xstream}.
+%The separation of graph update and graph computation not only allows existing algorithms designed for static graphs to be used for analyzing temporal graphs, but also enables the same familiar computation interface in existing static graph processing systems to be used for temporal graphs. In fact, TIDE employs the message passing-based vertex-centric programming model like in Pregel~\cite{pregel} for analyzing dynamic graphs, while Kineograph and Chronos use the vertex-centric scatter-gather model (like the GAS model of GraphLab~\cite{graphlab}) in either a pull mode or a push mode. In addition, Chronos can also support the edge-centric model proposed in X-Stream~\cite{xstream}.
 
 As per the terminology of temporal relational databases, this discussion considers {\em valid time} (against {\em transaction time}) as the underlying temporal dimension for historical analyses. Valid time denotes the time
 period during which a fact is true with respect to the real world. Transaction time is the time
@@ -139,22 +139,14 @@ in a data-parallel fashion across a cluster.
 
 \section{Storage and Retrieval}
 
-Storage of large temporal graphs is challenging and requires careful design. A straightforward use of static graph datastore can lead to a potential explosion in storage requirements, and/or incur high latency times for retrieving sub-graphs, or timeslices. The most straightforward being the storage of 
-In this section, we present the most recognized approaches for efficient storage and retrieval of historical graphs.
-
-Salzberg and Tsotras~\cite{Salzberg1999} present a comprehensive
-survey of temporal data indexing techinques, and discuss two extreme approaches 
-to supporting snapshot retrieval queries, referred to as the \textit{Copy} and \textit{Log} approaches. While the copy approach relies on storing new copies of a snapshot upon every point of change in the database, the log approach relies on storing everything through changes. Their hybrid is often referred to as the \textit{Copy+Log} approach.%We omit a detailed discussion of the work on temporal databases, and refer the interested reader to a representative set of references~\cite{Bolour92,DBLP:conf/sigmod/SnodgrassA85,Ozsoyoglu1995,Tansel1993,date2002temporal,tsql2,Salzberg1999}. 
-Other data structures, such as Interval Trees~\cite{Arge1996} and Segment trees~\cite{Blankenagel1994} can also be used for storing temporal information. Temporal aggregation in scientific array databases~\cite{soroush2013time} and time-series indexing~\cite{niennattrakul2010exact}, ~\cite{camerra2013beyond}, ~\cite{wang2013experimental} are other related topics of interest, but the challenges there are significantly different.
-
-TODO: all other temporal db references go here
-
+Storage of large temporal graphs is challenging and requires careful design. An effective storage system for temporal graphs has a twofold objective. First, the storage should be compact by effectively dealing with redundancy in form of non-changes in graphs across time. Second, it must allow for efficient retrieval of graph primitives such as snapshot(s), temporal range queries of nodes/neighborhoods, and others, as reflected in Figure~\ref{fig:et}. A straightforward use of static graph datastores can lead to an explosion in storage requirements, and/or incur high fetch latency times.  
+Two basic and extreme approaches from conventional storage methods 
+to support snapshot retrieval queries as referred to as the \textit{Copy} and \textit{Log} approaches~\cite{Salzberg1999}. While the copy approach relies on storing new copies of a snapshot upon every point of change in the database, the log approach relies on storing everything through changes. Their hybrid is often referred to as the \textit{Copy+Log} approach. Copy approach is clearly infeasible for frequently changing graphs because of intractable storage needs; the Log approach, while storing minimal information, makes it hard work to reconstruct any snapshot or temporal subset of the graph. %We omit a detailed discussion of the work on temporal databases, and refer the interested reader to a representative set of references~\cite{Bolour92,DBLP:conf/sigmod/SnodgrassA85,Ozsoyoglu1995,Tansel1993,date2002temporal,tsql2,Salzberg1999}. 
+Other data structures, such as Interval Trees~\cite{Arge1996} and Segment trees~\cite{Blankenagel1994} can also be used for storing temporal information. Temporal aggregation in scientific array databases~\cite{soroush2013time} and time-series indexing~\cite{niennattrakul2010exact}, ~\cite{camerra2013beyond}, ~\cite{wang2013experimental} are other related topics of interest, but the challenges there are significantly different. In this section, we present some of the most recognized approaches for efficient storage and retrieval of historical graphs.
 
 \subsection{Deltas-based Encodings}
-The original DeltaGraph~\cite{khurana2013efficient} system only supported retrieval of individual snapshots of the historical graph as of specific time instances. Here we instead discuss the extension of that work~\cite{khurana2016storing} that allows retrieval of different temporal graph primitives including neighborhood versions, node histories, and graph snapshots, and that features a temporal graph analysis framework built on top of Apache Spark. 
-
-\vspace{2mm}
-\noindent{\bf Temporal Graph Index.} DeltaGraph organizes the historical graph data in a hierarchical data structure, whose lowest level corresponds
+In order to register the changes in a graph over a period of time, the use of ``{\em deltas}'', or graph differences, is a powerful approach. If carefully organized, deltas can provide efficient retrieval at low storage costs. 
+The {\em DeltaGraph} index~\cite{khurana2013efficient}, for instance, provides highly efficient retrieval of individual snapshots of the historical graph as of specific time instances. DeltaGraph organizes the historical graph data in a hierarchical data structure, whose lowest level corresponds
 to the snapshots of the network over time, and whose interior nodes correspond to graphs constructed by ``combining''
 the lower level snapshots in some fashion; the interior nodes are typically not valid snapshots as of any specific time point. Neither the lowest-level
 graph snapshots nor the graphs corresponding to the interior nodes are actually stored explicitly. Instead, for each edge, a {\em delta}, i.e., the
@@ -162,14 +154,14 @@ difference between the two graphs corresponding to its endpoints, is computed, a
 corresponding to the root is explicitly stored. Given those, any specific snapshot can be constructed by traversing any
 path from the root to the node corresponding to the snapshot in the index, and by appropriately combining the information present in the deltas.
 Use of different ``combining'' functions leads to a different point in the performance-storage trade-off, with {\em intersection} being the most
-natural such function.  This index structure especially shines with multi-snapshot retrieval queries which are expected to be common in temporal 
+natural such function.  This index structure is especially effective with {\em multi-snapshot retrieval} queries which are expected to be common in temporal 
 analysis, as it can share the computation and retrieval of deltas across the multiple snapshots.
-The index structure is also {\bf extensible}, providing a user the opportunity to define additional 
+The index structure is also {\em extensible}, providing a user the opportunity to define additional 
 indexes to be created and maintained in order to efficiently execute specific queries (e.g., subgraph pattern matching, reachability, etc.)
     over the historical graph data.
 
-To facilitate distributed storage and parallel retrieval, the deltas themselves are partitioned horizontally by nodes and vertically by attributes 
-of the nodes, and these partitions are stored in a key-value store (specifically, Apache Cassandra). This allows efficient retrieval of not only
+DeltaGraph, while efficient at snapshot retrieval, is not suitable for fetching graph primitives such as histories of nodes or neighborhoods over specified periods of time. However, {\em Temporal Graph Index (TGI)}~\cite{khurana2016storing}, an extension of DeltaGraph which partitions deltas in so-called micro-deltas, and uses chaining of related microdeltas across horizontal nodes in the DeltaGraph, allows retrieval of different temporal graph primitives including neighborhood versions, node histories, and graph snapshots. 
+Such a micro-delta based design is great for distributed storage and parallel retrieval on a cloud. This allows efficient retrieval of not only
 entire snapshots, but also of individual neighborhoods or temporal histories of individual neighborhoods.
 
 
