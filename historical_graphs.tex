@@ -81,15 +81,14 @@ the study of change in centrality of vertices, path lengths of vertex pairs,
 etc.~\cite{pan2011path}, also lie under the larger umbrella of temporal graph analysis.
 Barrat et al.~\cite{barrat2008dynamical}, provide a good reference for studying several
 dynamic processes modeled over graphs. Holme et al.~\cite{holme2012temporal} provide a description of several networks from different domains that 
-are temporal or dynamic in nature.
+are temporal or dynamic in nature. 
 
+Historical or temporal analyses on graphs can vary greatly in the nature of analytical quantity as well as the scope of the graph locality and time-duration being analyzed. 
+Figure~\ref{fig:et} provides a classification on those lines and lists a few examples of graph retrieval and analysis tasks.
+A more exhaustive taxonomy of temporal tasks is provided by Ahn et al.~\cite{ahn2014task}.
 
-The purpose of this chapter is to highlight the recent advancements in graph data management system that can efficiently and scalably
-support these types of dynamic network analysis tasks over large volumes of data. The static graph data management systems are insufficient in supporting the analytical tasks described above, primarily due to a lack of understanding of the {\em change} or {\em difference} in graphs. The temporal graph analyses solutions based upon such systems become too expensive in storage costs, memory requirements, and often unfriendly or infeasible for an analyst to express in the first place. 
-As per the terminology of temporal relational databases, this discussion considers \textbf{valid time} (against \textbf{transaction time}) as the underlying temporal dimension for historical analyses. Valid time denotes the time
-period during which a fact is true with respect to the real world. Transaction time is the time
-when a fact is stored in the database. 
-It is worth noting that there is a related but orthogonal body of work which we do not touch in this chapter. It deals with the need to do {\em real-time analytics on the streaming data} as it is being generated; here the scope of the analysis typically only includes the latest snapshot or the snapshots from a recent window. The key challenge here is to be able to deal with the high rate at which the data is often generated.
+The static graph data management systems are insufficient in supporting the analytical tasks described above, primarily due to a lack of understanding of the {\em change} or {\em difference} in graphs. The temporal graph analyses solutions if performed using the conventional graph systems become too expensive in storage costs, memory requirements, and often unfriendly or infeasible for an analyst to express in the first place. 
+
 
 
 \begin{figure}
@@ -103,17 +102,18 @@ and entity. The chart lists retrieval tasks (black), graph operations (red), exa
 
 %Main Text
 
-TODO:
-Categorize different types/rates of change. Refer to Figure 1 on how different changes w.r.t. scope of the graph and timespan correspond to different analytical tasks and also different data management 
-Ahn et al.~\cite{ahn2014task} present an exhaustive taxonomy of temporal tasks. 
-
 
 The frequent change of a temporal graph poses a significant challenge to algorithm design, because the overwhelming majority of graph algorithms assume static graph structures. One would have to design special algorithms for each application to accommodate the dynamic aspects of graphs. To support general-purpose computations, most of the temporal graph systems adopt a strategy to separate graph updates from graph computation. More specifically, although updates are continually applied to a temporal graph, graph computation is only performed on a sequence of successive \emph{static} views of the temporal graph. For simplicity, most systems adopt a \emph{discretized-time} approach, so that time domain is set of natural numbers, i.e., $t\in \mathcal{N}$. 
 
 The separation of graph update and graph computation not only allows existing algorithms designed for static graphs to be used for analyzing temporal graphs, but also enables the same familiar computation interface in existing static graph processing systems to be used for temporal graphs. In fact, TIDE employs the message passing-based vertex-centric programming model like in Pregel~\cite{pregel} for analyzing dynamic graphs, while Kineograph and Chronos use the vertex-centric scatter-gather model (like the GAS model of GraphLab~\cite{graphlab}) in either a pull mode or a push mode. In addition, Chronos can also support the edge-centric model proposed in X-Stream~\cite{xstream}.
 
+As per the terminology of temporal relational databases, this discussion considers {\em valid time} (against {\em transaction time}) as the underlying temporal dimension for historical analyses. Valid time denotes the time
+period during which a fact is true with respect to the real world. Transaction time is the time
+when a fact is stored in the database. 
+It is worth noting that there is a related but orthogonal body of work which we do not touch in this chapter. It deals with the need to do {\em real-time analytics on the streaming data} as it is being generated; here the scope of the analysis typically only includes the latest snapshot or the snapshots from a recent window. The key challenge here is to be able to deal with the high rate at which the data is often generated.
 
-Broadly speaking the focus of this work is on providing the ability to analyze and to reason over the entire history of 
+
+Broadly speaking, this chapter's focus is to summarize the recent advances in providing the ability to analyze and to reason over the entire history of 
 the changes to a graph. There are many different types of analyses that may be of interest. 
 For example, an analyst may wish to study the evolution of well-studied static graph properties such
 as centrality measures, density, conductance, etc., over time. Another approach is through the search and 
@@ -133,7 +133,8 @@ We must also develop an expressive, high-level, easy-to-use programming framewor
 specify complex temporal graph analysis tasks, while ensuring that the specified tasks can be executed efficiently 
 in a data-parallel fashion across a cluster.
 
-
+%The purpose of this chapter is to highlight the recent advancements in graph data management system that can efficiently and scalably
+%support these types of dynamic network analysis tasks over large volumes of data. 
 
 
 \section{Storage and Retrieval}
@@ -201,7 +202,7 @@ LLAMA buffers incoming updates in a write-optimized lookup table, which stores t
 
 
 
-\section{Historical Graph Analytics}
+\section{Analytical Frameworks}
 
 \subsection{Runtime Environments}
 
