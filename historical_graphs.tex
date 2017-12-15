@@ -59,37 +59,38 @@ However, the traditional network data management systems are inadequate for such
 \end{abstract}
 
 \section{Overview}
-In recent years, many works have focused on designing analytical models that capture how a network evolves, with a primary focus on
-social networks and the Web (see, e.g., ~\cite{LeskovecKF07,Kumar:2006:SEO:1150402.1150476}).
-There is also much work on understanding how communities evolve, identifying key individuals,
-and locating hidden groups in dynamic networks. Berger-Wolf et
-al.~\cite{Berger-Wolf2006,tantipathananandh2007framework},  
+In recent years, many works have focused on designing analytical models that capture network evolves, with a focus on
+social networks and the Web (see, e.g., ~\cite{LeskovecKF07,Kumar:2006:SEO:1150402.1150476}). Studies show how communities evolve~\cite{tang2008community}, identifying key individuals,
+and locating hidden groups in dynamic networks~\cite{tantipathananandh2007framework},  characterizing the complex behavioral patterns
+of individuals and communities over time~\cite{Asur2009}.
 %present a framework that focuses on identifying communities and understanding how they change over time.
-Tang et al.~\cite{tang2008community} and Greene et al.~\cite{Greene2010} 
-address the problem of community evolution in
-dynamic networks.
-McCulloh and Carley~\cite{McCulloh2008} present techniques for social change detection.
-Asur et al.~\cite{Asur2009} present a framework for characterizing the complex behavioral patterns
-of individuals and communities over time. %Biologists share on predicting historical events leading to a 
+%Tang et al.~\cite{tang2008community} and Greene et al.~\cite{Greene2010} 
+%address the problem of community evolution in
+%dynamic networks.
+%McCulloh and Carley~\cite{McCulloh2008} present techniques for social change detection.
+%Asur et al.~\cite{Asur2009} present a framework for characterizing the complex behavioral patterns
+%of individuals and communities over time. %Biologists share on predicting historical events leading to a 
 %known biological network (e.g.,~\cite{10.1371/journal.pcbi.1001119})
 Biologists are interested in discovering historical events leading to a 
 known state of a Biological network (e.g.,~\cite{10.1371/journal.pcbi.1001119}).
-Evolution of shortest paths in dynamic
-graphs has been studied by Huo et al.~\cite{huo2014efficient}, Ren et al.~\cite{RenEvolvGraph11},
-and Xuan et al.~\cite{xuan2003computing}. Change in page rank with evolving graphs~\cite{desikan2005incremental,bahmani2010fast}, and
-the study of change in centrality of vertices, path lengths of vertex pairs,
-etc.~\cite{pan2011path}, also lie under the larger umbrella of temporal graph analysis.
-Barrat et al.~\cite{barrat2008dynamical}, provide a good reference for studying several
-dynamic processes modeled over graphs. Holme et al.~\cite{holme2012temporal} provide a description of several networks from different domains that 
-are temporal or dynamic in nature. 
-
-Historical or temporal analyses on graphs can vary greatly in the nature of analytical quantity as well as the scope of the graph locality and time-duration being analyzed. 
+%Evolution of shortest paths in dynamic
+%graphs has been studied by Huo et al.~\cite{huo2014efficient}, Ren et al.~\cite{RenEvolvGraph11},
+%and Xuan et al.~\cite{xuan2003computing}. 
+Change in page rank~\cite{bahmani2010fast}, change in centrality of vertices, path lengths of vertex pairs,
+etc.~\cite{pan2011path}, shortest paths~\cite{RenEvolvGraph11}, and others provide useful graph change analytical algorithms,
+%Barrat et al.~\cite{barrat2008dynamical}, provide a good reference for studying several dynamic processes modeled over graphs. 
+Historical or temporal analyses on graphs span a variety of tasks that vary in the analytical quantity of interest, as well as the scope of the graph locality and time-duration being analyzed. 
 Figure~\ref{fig:et} provides a classification on those lines and lists a few examples of graph retrieval and analysis tasks.
 A more exhaustive taxonomy of temporal tasks is provided by Ahn et al.~\cite{ahn2014task}.
+%Holme et al.~\cite{holme2012temporal} provide a description of several networks from different domains that 
+are temporal or dynamic in nature. 
 
 The static graph data management systems are insufficient in supporting the analytical tasks described above, primarily due to a lack of understanding of the {\em change} or {\em difference} in graphs. The temporal graph analyses solutions if performed using the conventional graph systems become too expensive in storage costs, memory requirements, and often unfriendly or infeasible for an analyst to express in the first place. 
-
-
+The frequent change of a temporal graph poses a significant challenge to algorithm design, because the overwhelming majority of graph algorithms assume static graph structures. One would have to design special algorithms for each application to accommodate the dynamic aspects of graphs. To support general-purpose computations, most of the temporal graph systems adopt a strategy to separate graph updates from graph computation. More specifically, although updates are continually applied to a temporal graph, graph computation is only performed on a sequence of successive \emph{static} views of the temporal graph. For simplicity, most systems adopt a \emph{discretized-time} approach, so that time domain is set of natural numbers, i.e., $t\in \mathcal{N}$. 
+As per the terminology of temporal relational databases, this discussion considers {\em valid time} (against {\em transaction time}) as the underlying temporal dimension for historical analyses. Valid time denotes the time
+period during which a fact is true with respect to the real world. Transaction time is the time
+when a fact is stored in the database. 
+It is worth noting that there is a related but orthogonal body of work which we do not touch in this chapter. It deals with the need to do {\em real-time analytics on the streaming data} as it is being generated; here the scope of the analysis typically only includes the latest snapshot or the snapshots from a recent window. The key challenge there is to be able to deal with the high rate at which the data is often generated.
 
 \begin{figure}
 \centering
@@ -103,14 +104,6 @@ and entity. The chart lists retrieval tasks (black), graph operations (red), exa
 %Main Text
 
 
-The frequent change of a temporal graph poses a significant challenge to algorithm design, because the overwhelming majority of graph algorithms assume static graph structures. One would have to design special algorithms for each application to accommodate the dynamic aspects of graphs. To support general-purpose computations, most of the temporal graph systems adopt a strategy to separate graph updates from graph computation. More specifically, although updates are continually applied to a temporal graph, graph computation is only performed on a sequence of successive \emph{static} views of the temporal graph. For simplicity, most systems adopt a \emph{discretized-time} approach, so that time domain is set of natural numbers, i.e., $t\in \mathcal{N}$. 
-
-%The separation of graph update and graph computation not only allows existing algorithms designed for static graphs to be used for analyzing temporal graphs, but also enables the same familiar computation interface in existing static graph processing systems to be used for temporal graphs. In fact, TIDE employs the message passing-based vertex-centric programming model like in Pregel~\cite{pregel} for analyzing dynamic graphs, while Kineograph and Chronos use the vertex-centric scatter-gather model (like the GAS model of GraphLab~\cite{graphlab}) in either a pull mode or a push mode. In addition, Chronos can also support the edge-centric model proposed in X-Stream~\cite{xstream}.
-
-As per the terminology of temporal relational databases, this discussion considers {\em valid time} (against {\em transaction time}) as the underlying temporal dimension for historical analyses. Valid time denotes the time
-period during which a fact is true with respect to the real world. Transaction time is the time
-when a fact is stored in the database. 
-It is worth noting that there is a related but orthogonal body of work which we do not touch in this chapter. It deals with the need to do {\em real-time analytics on the streaming data} as it is being generated; here the scope of the analysis typically only includes the latest snapshot or the snapshots from a recent window. The key challenge here is to be able to deal with the high rate at which the data is often generated.
 
 
 Broadly speaking, this chapter's focus is to summarize the recent advances in providing the ability to analyze and to reason over the entire history of 
@@ -142,9 +135,10 @@ in a data-parallel fashion across a cluster.
 Storage of large temporal graphs is challenging and requires careful design. An effective storage system for temporal graphs has a twofold objective. First, the storage should be compact by effectively dealing with redundancy in form of non-changes in graphs across time. Second, it must allow for efficient retrieval of graph primitives such as snapshot(s), temporal range queries of nodes/neighborhoods, and others, as reflected in Figure~\ref{fig:et}. A straightforward use of static graph datastores can lead to an explosion in storage requirements, and/or incur high fetch latency times.  
 Two basic and extreme approaches from conventional storage methods 
 to support snapshot retrieval queries as referred to as the \textit{Copy} and \textit{Log} approaches~\cite{Salzberg1999}. While the copy approach relies on storing new copies of a snapshot upon every point of change in the database, the log approach relies on storing everything through changes. Their hybrid is often referred to as the \textit{Copy+Log} approach. Copy approach is clearly infeasible for frequently changing graphs because of intractable storage needs; the Log approach, while storing minimal information, makes it hard work to reconstruct any snapshot or temporal subset of the graph. %We omit a detailed discussion of the work on temporal databases, and refer the interested reader to a representative set of references~\cite{Bolour92,DBLP:conf/sigmod/SnodgrassA85,Ozsoyoglu1995,Tansel1993,date2002temporal,tsql2,Salzberg1999}. 
-Other data structures, such as Interval Trees~\cite{Arge1996} and Segment trees~\cite{Blankenagel1994} can also be used for storing temporal information. Temporal aggregation in scientific array databases~\cite{soroush2013time} and time-series indexing~\cite{niennattrakul2010exact}, ~\cite{camerra2013beyond}, ~\cite{wang2013experimental} are other related topics of interest, but the challenges there are significantly different. In this section, we present some of the most recognized approaches for efficient storage and retrieval of historical graphs.
+Other data structures, such as Interval Trees~\cite{arge1996optimal} and Segment trees~\cite{Blankenagel1994} can also be used for storing temporal information. 
+%Temporal aggregation in scientific array databases~\cite{soroush2013time} and time-series indexing~\cite{niennattrakul2010exact}, ~\cite{camerra2013beyond}, ~\cite{wang2013experimental} are other related topics of interest, but the challenges there are significantly different. In this section, we present some of the most recognized approaches for efficient storage and retrieval of historical graphs.
 
-\subsection{Deltas-based Encodings}
+\subsection{Delta-based Encodings}
 In order to register the changes in a graph over a period of time, the use of ``{\em deltas}'', or graph differences, is a powerful approach. If carefully organized, deltas can provide efficient retrieval at low storage costs. 
 The {\em DeltaGraph} index~\cite{khurana2013efficient}, for instance, provides highly efficient retrieval of individual snapshots of the historical graph as of specific time instances. DeltaGraph organizes the historical graph data in a hierarchical data structure, whose lowest level corresponds
 to the snapshots of the network over time, and whose interior nodes correspond to graphs constructed by ``combining''
@@ -160,7 +154,7 @@ The index structure is also {\em extensible}, providing a user the opportunity t
 indexes to be created and maintained in order to efficiently execute specific queries (e.g., subgraph pattern matching, reachability, etc.)
     over the historical graph data.
 
-DeltaGraph, while efficient at snapshot retrieval, is not suitable for fetching graph primitives such as histories of nodes or neighborhoods over specified periods of time. However, {\em Temporal Graph Index (TGI)}~\cite{khurana2016storing}, an extension of DeltaGraph which partitions deltas in so-called micro-deltas, and uses chaining of related microdeltas across horizontal nodes in the DeltaGraph, allows retrieval of different temporal graph primitives including neighborhood versions, node histories, and graph snapshots. 
+DeltaGraph, while efficient at snapshot retrieval, is not suitable for fetching graph primitives such as histories of nodes or neighborhoods over specified periods of time. However, {\em Temporal Graph Index (TGI)}~\cite{khurana2016storing}, an extension of DeltaGraph which partitions deltas in so-called {\em micro-deltas}, and uses chaining of related microdeltas across horizontal nodes in the DeltaGraph, allows retrieval of different temporal graph primitives including neighborhood versions, node histories, and graph snapshots. 
 Such a micro-delta based design is great for distributed storage and parallel retrieval on a cloud. This allows efficient retrieval of not only
 entire snapshots, but also of individual neighborhoods or temporal histories of individual neighborhoods.
 
@@ -182,13 +176,15 @@ The edge table for a snapshot $i$ is organized as a fixed-length array that stor
 
 \section{Analytical Frameworks}
 
-Running graph analytics for temporal graphs comes with its challenges as well as opportunities. Let us take a look at two main aspects as the runtime system components and interfaces to express the analytical task.
+Running graph analytics deals with two main aspects -- runtime system components and interfaces to express the analytical task.
 
 \subsection{Runtime Environment Aspects}
 
-\noindent{\bf In-Memory Graph Layouts.} Like the storage and indexing of temporal graphs, dealing with temporal redundancy is important in the in-memory data structures used for execution of the analytics. For exampling, when running a graph algorithm or evaluating a metric on various snapshots of a graph, it might be prohibitively expensive to store all the snapshots in the memory at the same time. However, most graph libraries work on a plain isolated version of the graph. The most common solution to this problem is to use an overlaying of multiple versions on one another, and using bitmaps and an additional lookup table to establish the validity of a graph component to one or more versions. This reduces any redundancy of nodes, edges or attributes that occur across multiple versions, yet obtaining access to each snapshot as a static graph through a simple interface. GraphPool~\cite{} and Chronos~\cite{han2014chronos} amongst others use variations of this technique. In addition, Chronos also employs such a structure for locality-aware batch scheduling (LABS) of graph computation. More specifically, LABS batches the processing of a vertex across all the snapshots, as well as the information propagation to a neighboring vertex for all the snapshots.
+\noindent{\bf In-Memory Graph Layouts.} Like the storage and indexing of temporal graphs, dealing with temporal redundancy is important in the in-memory data structures used for execution of the analytics. For exampling, when running a graph algorithm or evaluating a metric on various snapshots of a graph, it might be prohibitively expensive to store all the snapshots in the memory at the same time. However, most graph libraries work on a plain isolated version of the graph. The most common solution to this problem is to use an overlaying of multiple versions on one another, and using bitmaps and an additional lookup table to establish the validity of a graph component to one or more versions. This reduces any redundancy of nodes, edges or attributes that occur across multiple versions, yet obtaining access to each snapshot as a static graph through a simple interface. GraphPool~\cite{khurana2013efficient} and Chronos~\cite{han2014chronos} amongst others use variations of this technique. In addition, Chronos also employs such a structure for locality-aware batch scheduling (LABS) of graph computation. More specifically, LABS batches the processing of a vertex across all the snapshots, as well as the information propagation to a neighboring vertex for all the snapshots.
 
-\noindent{\bf Parallelism.} Temporal graph analytics presents opportunities for parallelization in two different ways. First, evaluating a property across multiple snapshots can be easily parallelized, unless . Second, several static graph computation operations such as Pagerank, can be run in parallel themselves. Determining the optimum level of parallelism for an analytical task can be complex and depends on the exact computation steps, nature of graph data and the resources available. TGAF~\cite{} provides parallelism by expressing all temporal graphs as RDDs of time evolving nodes or subgraphs and letting the underlying Spark infrastructure plan the parallelism. Leveraging Spark parallelism provides abundant benefits, along with simplicity of design. However, it there are occasions on which certain tasks can be customized for better results. A major drawback with TGAF is the lack of space saving obtained through overlaid structures such as GraphPool. LABS and Llama show effective locality-based multi-core parallelism.%Note that while batch processing such as LABS reduces computation cycles, parallelism becomes more complicated.
+\vspace{2mm}
+
+\noindent{\bf Parallelism.} Temporal graph analytics presents opportunities for parallelization in two different ways. First, evaluating a property across multiple snapshots can be easily parallelized, unless . Second, several static graph computation operations such as Pagerank, can be run in parallel themselves. Determining the optimum level of parallelism for an analytical task can be complex and depends on the exact computation steps, nature of graph data and the resources available. TGAF~\cite{khurana2016storing} provides parallelism by expressing all temporal graphs as RDDs of time evolving nodes or subgraphs and letting the underlying Spark infrastructure plan the parallelism. Leveraging Spark parallelism provides abundant benefits, along with simplicity of design. However, it there are occasions on which certain tasks can be customized for better results. A major drawback with TGAF is the lack of space saving obtained through overlaid structures such as GraphPool. LABS and Llama show effective locality-based multi-core parallelism.%Note that while batch processing such as LABS reduces computation cycles, parallelism becomes more complicated.
 
 
 
@@ -210,12 +206,12 @@ Running graph analytics for temporal graphs comes with its challenges as well as
 
 
 \subsection{Analytical Interfaces}
-There are mainly two kinds of historical graph analytical interfaces. The first one, a programmatic interface involves 
+There are mainly two kinds of historical graph analytical interfaces. The first one, a programmatic interface involves an abstraction of a temporal graph and various operations that can be performed on it, along with calls to several static (sub-)graph routines. The second kind are the visual exploration tools which are usually targeted to more specific types of analytic options but provide an easier means to express the task through GUI interfaces and provide meaningful visualization of the results. One example of a programmatic interface is TGAF~\cite{khurana2016storing}, which abstracts the temporal graph through two main primitives --  {\em Set of (evolving) nodes}, or {\em SoN}, or {\em Set of temporal subgraphs}, or {\em SoTS}. The entire temporal graph or any part of it may be expressed as one of these primitives. A SoN is best illustrated as a three dimensional array along the axes of time, nodes and attributes. The system also defines graph manipulation operations such as {\em timeslicing}, {\em selection}, {\em filtering}; compute operators such as {\em node compute map}, {\em temporal node compute map}, {\em node compute delta}, amongst others; it also provides analytical operators such as {\em compare}, {\em evolution}, and others. A rich set of operators enables the expression of complex analytical operations. We omit further details here and refer the interested reader to ~\cite{khurana2016storing} and ~\cite{khurana2015historical}.
 
-Visualization is a an effective tool in exploring and analyzing a temporal graph. Following is a rather brief and non-exhaustive list of techniques and tools that provide such capabilities. 
-Erten et al.~\cite{erten2004exploring} present visual analysis for an evolving dataset in computing literature through properties like diameter, connected components, collaborators, co-authors, topic trends over time.
+Visualization is an effective means to exploring and analyzing a temporal graph. Following is a rather brief and non-exhaustive list of techniques and tools that provide such capabilities. 
+%Erten et al.~\cite{erten2004exploring} present visual analysis for an evolving dataset in computing literature through properties like diameter, connected components, collaborators, co-authors, topic trends over time.
 Using visualization of different snapshots, Toyoda et al.~\cite{toyoda2005system} study events like appearance of pages, relationship between different pages for a historical dataset of Web archive.
-More such examples can be found in a survey by Kerracher et al.~\cite{kerracher2015task}. Different visualization techniques are useful in the process of gaining insights into the temporal nature of graphs. For instance, NetEvViz~\cite{khurana2011visual} extends NodeXL, to study evolving networks. It uses an edge color coding scheme for comparative study of network growth. Ahn et al.~\cite{ahn2011temporal} focus on different states of graph components in order to visualize temporal dynamics of a social network.
+More such examples can be found in a survey by Kerracher et al.~\cite{kerracher2015task}. Different visualization techniques are useful in the process of gaining insights into the temporal nature of graphs. For instance, NetEvViz~\cite{khurana2011visual} extends NodeXL (a popular graph analysis tool), to study evolving networks. It uses an edge color coding scheme for comparative study of network growth. Ahn et al.~\cite{ahn2011temporal} focus on different states of graph components in order to visualize temporal dynamics of a social network.
 Alternate representations to node-link diagrams have been proposed in order to study temporal nature of social networks, such as TimeMatrix~\cite{yi2010timematrix} that uses a matrix based visualization to better capture temporal aggregations and overlays. A temporal evolution analysis technique based on capturing visual consistency across snapshots can be seen in the work of Xu et al.~\cite{xu2011visualizing}.
 A survey by Beck et al.~\cite{beck2014state} lists several other approaches for visual analysis of dynamic graphs. 
 
