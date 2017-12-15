@@ -182,49 +182,35 @@ The edge table for a snapshot $i$ is organized as a fixed-length array that stor
 
 \section{Analytical Frameworks}
 
-\subsection{Runtime Environments}
+Running graph analytics for temporal graphs comes with its challenges as well as opportunities. Let us take a look at two main aspects as the runtime system components and interfaces to express the analytical task.
 
-\noindent{\bf In-Memory Graph Layouts.} Talk about overlaid graph layout - GraphPool, Chronos (LABS).  
+\subsection{Runtime Environment Aspects}
 
-\noindent{\bf Incremental Computation.} goes here.
+\noindent{\bf In-Memory Graph Layouts.} Like the storage and indexing of temporal graphs, dealing with temporal redundancy is important in the in-memory data structures used for execution of the analytics. For exampling, when running a graph algorithm or evaluating a metric on various snapshots of a graph, it might be prohibitively expensive to store all the snapshots in the memory at the same time. However, most graph libraries work on a plain isolated version of the graph. The most common solution to this problem is to use an overlaying of multiple versions on one another, and using bitmaps and an additional lookup table to establish the validity of a graph component to one or more versions. This reduces any redundancy of nodes, edges or attributes that occur across multiple versions, yet obtaining access to each snapshot as a static graph through a simple interface. GraphPool~\cite{} and Chronos~\cite{han2014chronos} amongst others use variations of this technique. In addition, Chronos also employs such a structure for locality-aware batch scheduling (LABS) of graph computation. More specifically, LABS batches the processing of a vertex across all the snapshots, as well as the information propagation to a neighboring vertex for all the snapshots.
 
-\noindent{\bf Parallelization.} TGAF - no overlaying but that is useful for Spark-based parallelization. Talk about RDD based temporal graph abstraction
-Llama parallelization. Potential of parallelization based on multi time-point computation.
-
-
-TODO: Use the following material.
-
-GraphPool, Chronos, TGAF Spark, etc. Mention the data structures, parallelization, temporal compression.
-
-\vspace{2mm}
-\noindent{\bf Temporal Graph Analysis Framework.} The second, somewhat orthogonal, component of this system is a Apache Spark-based analysis
-framework to specify temporal graph analysis tasks. This analysis framework is based on an abstraction of a \textit{set of nodes 
-(or subgraphs) evolving over time}. Several operations are supported on top of this abstraction, including selection, timeslicing, and
-temporal {\em map} and {\em reduce} operations. The library is implemented in Python and Java, is built on top of Apache Spark, and also provides
-integration with GraphX for executing graph algorithms supported by that system.
+\noindent{\bf Parallelism.} Temporal graph analytics presents opportunities for parallelization in two different ways. First, evaluating a property across multiple snapshots can be easily parallelized, unless . Second, several static graph computation operations such as Pagerank, can be run in parallel themselves. Determining the optimum level of parallelism for an analytical task can be complex and depends on the exact computation steps, nature of graph data and the resources available. TGAF~\cite{} provides parallelism by expressing all temporal graphs as RDDs of time evolving nodes or subgraphs and letting the underlying Spark infrastructure plan the parallelism. Leveraging Spark parallelism provides abundant benefits, along with simplicity of design. However, it there are occasions on which certain tasks can be customized for better results. A major drawback with TGAF is the lack of space saving obtained through overlaid structures such as GraphPool. LABS and Llama show effective locality-based multi-core parallelism.%Note that while batch processing such as LABS reduces computation cycles, parallelism becomes more complicated.
 
 
 
-\noindent{\bf In-Memory Graph Layout.} There are two kinds of locality for temporal graphs that can be exploited for efficient data layout: \emph{time} locality, where states of a vertex (or an edge) in consecutive snapshots are stored together; and \emph{structure} locality, where states of neighboring vertices in the same snapshot are laid out close to each other. Due to the complex structure of a graph, structure locality is very hard to achieve. Chronos thus favors time locality for graph layout. The selected snapshots for a temporal graph in a time range are stored together in a vertex data array and an edge array. In the vertex data array, data is grouped by the vertices. The data of a vertex in consecutive snapshots are placed together. In the edge array, all the edges are grouped by the source vertices. Inside each group, every edge stores the target vertex ID and a bitmap indicating the snapshots that contain the edge. 
+%\noindent{\bf In-Memory Graph Layout.} There are two kinds of locality for temporal graphs that can be exploited for efficient data layout: \emph{time} locality, where states of a vertex (or an edge) in consecutive snapshots are stored together; and \emph{structure} locality, where states of neighboring vertices in the same snapshot are laid out close to each other. Due to the complex structure of a graph, structure locality is very hard to achieve. Chronos thus favors time locality for graph layout. The selected snapshots for a temporal graph in a time range are stored together in a vertex data array and an edge array. In the vertex data array, data is grouped by the vertices. The data of a vertex in consecutive snapshots are placed together. In the edge array, all the edges are grouped by the source vertices. Inside each group, every edge stores the target vertex ID and a bitmap indicating the snapshots that contain the edge. 
 %Although storing all the snapshots in this aggregate form has some similarity to the aggregate graph concept in TIDE, they are used in different context. TIDE stores sample graphs at the same time point together, whereas Chronos stores snapshots in different time points together.
 
-\vspace{2mm}
+%\vspace{2mm}
 
-\noindent{\bf Scheduling of Graph Computation.} To leverage the time-locality graph layout, Chronos employs the locality-aware batch scheduling (LABS) of graph computation. More specifically, LABS batches the processing of a vertex across all the snapshots, as well as the information propagation to a neighboring vertex for all the snapshots. %This batching is similar to the bulk execution model in TIDE, but again TIDE uses it for different sample graphs at the same time point instead of snapshots at different time points. 
-In~\cite{han2014chronos}, the authors show that with a simple partition-by-vertex strategy, LABS significantly improves the performance of graph computation in a multi-core parallel setting.
-
-\vspace{2mm}
-
-\noindent{\bf Incremental Computation.} Since Chronos targets at time-range graph analysis, it benefits more from incremental computation. Besides the incremental approach discussed at the end of Section~\ref{ssec:dynamicOverview}, Chronos proposes two enhancements. First, if the target time-range contains a sequence of $N$ snapshots $S_0$ to $S_{N-1}$, it first computes on $S_0$, and then uses the final states of $S_0$ as the initial states for $S_1$ to $S_{N-1}$, and computes the remaining $N-1$ snapshots in one batch using LABS. In the second enhancement, Chronos pre-computes the intersection (or the union) of the $N$ snapshots, applies graph computation on the intersection (or union) graph first, and then uses the final states of this computation as the initial states for all the snapshots and computes all the snapshots in a batch. The second enhancement allows incremental algorithms designed for edge-insertion only to work with temporal graphs with edge deletion.
+%\noindent{\bf Scheduling of Graph Computation.} To leverage the time-locality graph layout, Chronos employs the locality-aware batch scheduling (LABS) of graph computation. More specifically, LABS batches the processing of a vertex across all the snapshots, as well as the information propagation to a neighboring vertex for all the snapshots. %This batching is similar to the bulk execution model in TIDE, but again TIDE uses it for different sample graphs at the same time point instead of snapshots at different time points. 
+%In~\cite{han2014chronos}, the authors show that with a simple partition-by-vertex strategy, LABS significantly improves the performance of graph computation in a multi-core parallel setting.
 
 \vspace{2mm}
 
+\noindent{\bf Incremental Computation.} Time-range graph analysis can benefits from incremental or shared computation. First, for iterative algorithms such as PageRank, if the target time-range contains a sequence of $N$ snapshots $S_0$ to $S_{N-1}$, the result computed on $S_0$ can be used to initialize the solution for $S_1$, and so on until $S_{N-1}$. This reduces the number of iterations needed to converge an algorithm, but also serializes the computations because of the newly created dependence. Chronos utilizes a variation of this principle, to effectively perform incremental computation. 
+%In the second enhancement, Chronos pre-computes the intersection (or the union) of the $N$ snapshots, applies graph computation on the intersection (or union) graph first, and then uses the final states of this computation as the initial states for all the snapshots and computes all the snapshots in a batch. The second enhancement allows incremental algorithms designed for edge-insertion only to work with temporal graphs with edge deletion.
+
+%\vspace{2mm}
 
 
-\subsection{Interfaces}
-Talk about programmatic interfaces first Temporal graph algebra - TGAF etc., Julia Stoyanovich's papers. 
 
-In second paragraph, talk about visual analytics.
+\subsection{Analytical Interfaces}
+There are mainly two kinds of historical graph analytical interfaces. The first one, a programmatic interface involves 
 
 Visualization is a an effective tool in exploring and analyzing a temporal graph. Following is a rather brief and non-exhaustive list of techniques and tools that provide such capabilities. 
 Erten et al.~\cite{erten2004exploring} present visual analysis for an evolving dataset in computing literature through properties like diameter, connected components, collaborators, co-authors, topic trends over time.
