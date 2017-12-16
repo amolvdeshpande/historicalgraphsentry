@@ -60,7 +60,7 @@ However, the traditional network data management systems provide inadequate supp
 
 \section{Overview}
 In recent years, several works have designed analytical models that capture network evolution, with a focus on
-social networks and the Web (see, e.g., ~\cite{LeskovecKF07,Kumar:2006:SEO:1150402.1150476}). Studies have shown how communities evolve~\cite{tang2008community}, identifying key individuals,
+social networks and the Web~\cite{LeskovecKF07,Kumar:2006:SEO:1150402.1150476}. Studies analyze how communities evolve~\cite{tang2008community}, identifying key individuals,
 and locating hidden groups in dynamic networks~\cite{tantipathananandh2007framework}, also characterizing the complex behavioral patterns 
 of individuals and communities over time~\cite{Asur2009}.
 %present a framework that focuses on identifying communities and understanding how they change over time.
@@ -85,7 +85,7 @@ A more exhaustive taxonomy of temporal tasks is provided by Ahn et al.~\cite{ahn
 %Holme et al.~\cite{holme2012temporal} provide a description of several networks from different domains that 
 %are temporal or dynamic in nature. 
 
-Typical graph data management systems that are based on static graphs, do not provide sufficient support for the analytical tasks described above. They lack a general understanding of the {\em change} or {\em difference} in graphs. If performed using the conventional graph systems, such tasks become too expensive in storage costs, memory requirements, or execution time, and are often unfriendly or infeasible for an analyst to even express in the first place. 
+Typical graph data management systems that are based on static graphs, do not provide sufficient support for the analytical tasks described above. This is due to a fundamental lack in the modeling of the {\em change} of information. If performed using the conventional graph systems, such tasks become too expensive in storage costs, memory requirements, or execution time, and are often unfriendly or infeasible for an analyst to even express in the first place. 
 The frequent change of a temporal graph also poses a significant challenge to algorithm design, because the overwhelming majority of graph algorithms assume static graph structures. One would have to design special algorithms for each application to accommodate the dynamic aspects of graphs. To support general-purpose computations, most of the emerging temporal graph systems adopt a strategy to separate graph updates from graph computation. More specifically, although updates are continually applied to a temporal graph, graph computation is only performed on a sequence of successive \emph{static} views of the temporal graph. For simplicity, most systems adopt a \emph{discretized-time} approach, so that time domain is set of natural numbers, i.e., $t\in \mathcal{N}$. 
 As per the terminology of temporal relational databases, this discussion considers {\em valid time} (against {\em transaction time}) as the underlying temporal dimension for historical analyses. Valid time denotes the time
 period during which a fact is true with respect to the real world. Transaction time is the time
@@ -94,7 +94,7 @@ It is worth noting that there is a related but orthogonal body of work which we 
 
 \begin{figure}
 \centering
-\includegraphics [width=0.85\textwidth]{entity-time.pdf}
+\includegraphics [width=0.75\textwidth]{entity-time.pdf}
 \caption{A temporal graph can be represented across two different dimensions - time
 and entity. The chart lists retrieval tasks (black), graph operations (red), example queries
 (magenta) at different granularities of time and entity size.}
@@ -195,7 +195,7 @@ Running graph analytics requires dealing with two main aspects -- the runtime sy
 
 \vspace{2mm}
 
-\noindent{\bf Incremental Computation.} Time-range graph analysis can benefits from incremental or shared computation. First, for iterative algorithms such as PageRank, if the target time-range contains a sequence of $N$ snapshots $S_0$ to $S_{N-1}$, the result computed on $S_0$ can be used to initialize the solution for $S_1$, and so on until $S_{N-1}$. This reduces the number of iterations needed to converge an algorithm, but also serializes the computations because of the newly created dependence. Chronos utilizes a variation of this principle, to effectively perform incremental computation. 
+\noindent{\bf Incremental Computation.} Time-range graph analysis can benefits from incremental or shared computation. First, for iterative algorithms such as PageRank, if the target time-range contains a sequence of $N$ snapshots $S_0$ to $S_{N-1}$, the result computed on $S_0$ can be used to initialize the solution for $S_1$, and so on until $S_{N-1}$. This reduces the number of iterations needed to converge an algorithm, but also serializes the computations because of the newly created dependence. Chronos utilizes a variation of this principle to effectively perform incremental computation. 
 %In the second enhancement, Chronos pre-computes the intersection (or the union) of the $N$ snapshots, applies graph computation on the intersection (or union) graph first, and then uses the final states of this computation as the initial states for all the snapshots and computes all the snapshots in a batch. The second enhancement allows incremental algorithms designed for edge-insertion only to work with temporal graphs with edge deletion.
 
 %\vspace{2mm}
@@ -208,7 +208,8 @@ There are mainly two kinds of historical graph analytical interfaces. The first 
 Visualization is an effective means for exploring and analyzing a temporal graph. Following is a rather brief and non-exhaustive reference to techniques and tools that have demonstrated such capabilities. 
 %Erten et al.~\cite{erten2004exploring} present visual analysis for an evolving dataset in computing literature through properties like diameter, connected components, collaborators, co-authors, topic trends over time.
 Using visualization of different snapshots, Toyoda et al.~\cite{toyoda2005system} study events like appearance of pages, relationship between different pages for a historical dataset of Web archive.
-More such examples can be found in a survey by Kerracher et al.~\cite{kerracher2015task}. Different visualization techniques are useful in the process of gaining insights into the temporal nature of graphs. For instance, NetEvViz~\cite{khurana2011visual} extends NodeXL (a popular graph analysis tool), to study evolving networks. It uses an edge color coding scheme for comparative study of network growth. Ahn et al.~\cite{ahn2011temporal} focus on different states of graph components in order to visualize temporal dynamics of a social network.
+%More such examples can be found in a survey by Kerracher et al.~\cite{kerracher2015task}. 
+NetEvViz~\cite{khurana2011visual} extends NodeXL (a popular graph analysis tool), to study evolving networks. It uses an edge color coding scheme for comparative study of network growth. Ahn et al.~\cite{ahn2011temporal} focus on different states of graph components in order to visualize temporal dynamics of a social network.
 Alternate representations to node-link diagrams have been proposed in order to study temporal nature of social networks, such as TimeMatrix~\cite{yi2010timematrix} that uses a matrix based visualization to better capture temporal aggregations and overlays. A temporal evolution analysis technique based on capturing visual consistency across snapshots can be seen in the work of Xu et al.~\cite{xu2011visualizing}.
 A survey by Beck et al.~\cite{beck2014state} lists several other approaches for visual analysis of dynamic graphs. 
 
